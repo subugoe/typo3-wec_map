@@ -28,12 +28,6 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_map.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'map_service/google/class.tx_wecmap_marker_google.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_backend.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_domainmgr.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
 /**
  * Map implementation for the Google Maps mapping service.
  *
@@ -42,42 +36,44 @@
  * @subpackage tx_wecmap
  */
 class tx_wecmap_map_google extends tx_wecmap_map {
-	var $lat;
-	var $long;
-	var $zoom;
-	var $markers;
-	var $width;
-	var $height;
-	var $mapName;
+	public $lat;
+	public $long;
+	public $zoom;
+	public $markers;
+	public $width;
+	public $height;
+	public $mapName;
 
-	var $js;
-	var $key;
-	var $control;
-	var $type;
-	var $directions;
-	var $kml;
-	var $prefillAddress;
-	var $directionsDivID;
-	var $showInfoOnLoad;
-	var $maxAutoZoom = 15;
-	var $static = false;
+	public $js;
+	public $key;
+	public $control;
+	public $type;
+	public $directions;
+	public $kml;
+	public $prefillAddress;
+	public $directionsDivID;
+	public $showInfoOnLoad;
+	public $maxAutoZoom = 15;
+	public $static = false;
 
 	// array to hold the different Icons
-	var $icons;
+	public $icons;
 
-	var $lang;
+	public $lang;
 
-	var $markerClassName = 'tx_wecmap_marker_google';
+	public $markerClassName = 'tx_wecmap_marker_google';
 
 	/**
 	 * Class constructor.  Creates javscript array.
-	 * @access	public
-	 * @param	string		The Google Maps API Key
-	 * @param	string		The latitude for the center point on the map.
-	 * @param 	string		The longitude for the center point on the map.
-	 * @param	string		The initial zoom level of the map.
+	 * @param	string	$key	The Google Maps API Key
+	 * @param	int	$width
+	 * @param	int	$height
+	 * @param	string	$lat	The latitude for the center point on the map.
+	 * @param 	string	$long	The longitude for the center point on the map.
+	 * @param	string	$zoom	The initial zoom level of the map.
+	 * @param	string	$mapName	The name of the map
 	 */
-	function tx_wecmap_map_google($key, $width=250, $height=250, $lat='', $long='', $zoom='', $mapName='') {
+	public function tx_wecmap_map_google($key, $width=250, $height=250, $lat='', $long='', $zoom='', $mapName='') {
 		$this->prefixId = 'tx_wecmap_map_google';
 		$this->js = array();
 		$this->markers = array();
@@ -87,7 +83,7 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 		$this->icons = array();
 
 		if(!$key) {
-			$domainmgr = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_domainmgr');
+			$domainmgr = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_domainmgr::class);
 			$this->key = $domainmgr->getKey();
 		} else {
 			$this->key = $key;
@@ -129,8 +125,7 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	 * overviewMap, and mapType.
 	 *
 	 * @access	public
-	 * @param	string	The name of the control to add.
-	 * @return	none
+	 * @param	string $name	The name of the control to add.
 	 *
 	 **/
 	function addControl($name) {
@@ -199,8 +194,8 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	/**
 	 * Returns the localized label of the LOCAL_LANG key, $key
 	 *
-	 * @param	array		the LOCAL_LANG array
-	 * @param	string		The key from the LOCAL_LANG array for which to return the value.
+	 * @param	array	$ll	the LOCAL_LANG array
+	 * @param	string	$key	The key from the LOCAL_LANG array for which to return the value.
 	 * @return	string		The value from LOCAL_LANG.
 	 */
 	function getLL($ll,$key)	{
@@ -259,7 +254,7 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 			// auto center and zoom if necessary
 			$this->autoCenterAndZoom();
 
-			$htmlContent .= $this->mapDiv();
+			$htmlContent = $this->mapDiv();
 
 			$get = \TYPO3\CMS\Core\Utility\GeneralUtility::_GPmerged('tx_wecmap_api');
 
@@ -270,8 +265,6 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 
 			$scheme = (\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://');
 			// get the correct API URL
-//			$apiURL = tx_wecmap_backend::getExtConf('apiURL');
-//			$apiURL = sprintf($apiURL, $this->lang);
 			$apiURL = $scheme . 'maps.googleapis.com/maps/api/js?sensor=false&amp;language=' . $this->lang . '&amp;libraries=places';
 
 
@@ -342,11 +335,9 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 			if ( is_array( $this->groups ) )
 			{
 				foreach ($this->groups as $key => $group ) {
-					// TODO: devlog start
 					if(TYPO3_DLOG) {
 						\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': adding '. $group->getMarkerCount() .' markers from group '.$group->id, 'wec_map_api');
 					}
-					// devlog end
 					$jsContent = array_merge($jsContent, $group->drawMarkerJS());
 					$jsContent[] = '';
 				}
@@ -357,13 +348,9 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 			$jsContent[] = $this->js_loadCalls();
 			$jsContent[] = $this->js_drawMapEnd();
 
-//echo \TYPO3\CMS\Core\Utility\GeneralUtility::debug( $jsContent );
-
-			// TODO: devlog start
 			if(TYPO3_DLOG) {
 				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': finished map drawing', 'wec_map_api');
 			}
-			// devlog end
 
 			// get our content out of the array into a string
 			$jsContentString = implode(chr(10), $jsContent);
@@ -376,7 +363,6 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 		} else if (!$hasHeightWidth) {
 			$error = '<p>'.$this->getLL($lang, 'error_noHeightWidth' ).'</p>';
 		}
-		// TODO: devlog start
 		if(TYPO3_DLOG) {
 			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': finished map drawing with errors', 'wec_map_api', 2);
 		}
@@ -439,17 +425,17 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	/**
 	 * Adds an address to the currently list of markers rendered on the map. Support tabs.
 	 *
-	 * @param	string		The street address.
-	 * @param	string		The city name.
-	 * @param	string		The state or province.
-	 * @param	string		The ZIP code.
-	 * @param	string		The country name.
-	 * @param 	array 		Array of tab labels. Need to be kept short.
-	 * @param	array		Array of titles for the marker popup.
-	 * @param	array		Array of descriptions to be displayed in the marker popup.
-	 * @param	integer		Minimum zoom level for marker to appear.
-	 * @param	integer		Maximum zoom level for marker to appear.
-	 * @return	marker object
+	 * @param	string	$street	The street address.
+	 * @param	string	$city	The city name.
+	 * @param	string	$state	The state or province.
+	 * @param	string	$zip	The ZIP code.
+	 * @param	string	$country	The country name.
+	 * @param 	array 	$tabLabels	Array of tab labels. Need to be kept short.
+	 * @param	array	$title	Array of titles for the marker popup.
+	 * @param	array	$description	Array of descriptions to be displayed in the marker popup.
+	 * @param	int	$minzoom	Minimum zoom level for marker to appear.
+	 * @param	integer	$maxzoom	Maximum zoom level for marker to appear.
+	 * @return	object marker object
 	 * @todo	Zoom levels are very Google specific.  Is there a generic way to handle this?
 	 */
 	function addMarkerByAddressWithTabs($street, $city, $state, $zip, $country, $tabLabels = null, $title=null, $description=null, $minzoom = 0, $maxzoom = 18, $iconID = '') {
@@ -463,13 +449,14 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	/**
 	 * Adds an address string to the current list of markers rendered on the map.
 	 *
-	 * @param	string		The full address string.
-	 * @param	array 		Array of strings to be used as labels on the tabs
-	 * @param	array		The titles for the tabs of the marker popup.
-	 * @param	array		The descriptions to be displayed in the tabs of the marker popup.
-	 * @param	integer		Minimum zoom level for marker to appear.
-	 * @param	integer		Maximum zoom level for marker to appear.
-	 * @return	marker object
+	 * @param	string	$string	The full address string.
+	 * @param	array 	$tabLabels	Array of strings to be used as labels on the tabs
+	 * @param	array	$title	The titles for the tabs of the marker popup.
+	 * @param	array	$description	The descriptions to be displayed in the tabs of the marker popup.
+	 * @param	integer	$minzoom	Minimum zoom level for marker to appear.
+	 * @param	integer	$maxzoom	Maximum zoom level for marker to appear.
+	 * @param	integer	$iconID	Icon ID
+	 * @return	object marker object
 	 * @todo	Zoom levels are very Google specific.  Is there a generic way to handle this?
 	 **/
 	function addMarkerByStringWithTabs($string, $tabLabels, $title=null, $description=null, $minzoom = 0, $maxzoom = 18, $iconID = '') {
@@ -502,7 +489,6 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 		$uid = intval($uid);
 
 		// first get the mappable info from the TCA
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
 		$tca = $GLOBALS['TCA'][$table]['ctrl']['EXT']['wec_map'];
 
 		if(!$tca) return false;
@@ -540,12 +526,13 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	/**
 	 * Adds a lat/long to the currently list of markers rendered on the map.
 	 *
-	 * @param	float		The latitude.
-	 * @param	float		The longitude.
-	 * @param	string		The title for the marker popup.
-	 * @param	string		The description to be displayed in the marker popup.
-	 * @param	integer		Minimum zoom level for marker to appear.
-	 * @param	integer		Maximum zoom level for marker to appear.
+	 * @param	float	$lat	The latitude.
+	 * @param	float	$long	The longitude.
+	 * @param	string	$tabLabels	The title for the marker popup.
+	 * @param	string	$title	The description to be displayed in the marker popup.
+	 * @param	integer	$minzoom	Minimum zoom level for marker to appear.
+	 * @param	integer	$maxzoom	Maximum zoom level for marker to appear.
+	 * @param	integer	$iconID	Icon ID
 	 * @return	marker object
 	 * @todo	Zoom levels are very Google specific.  Is there a generic way to handle this?
 	 */
@@ -659,10 +646,9 @@ class tx_wecmap_map_google extends tx_wecmap_map {
 	/**
 	 * Adds some language specific markers to the global WecMap JS object.
 	 *
-	 * @access	private
 	 * @return	string		The Javascript code for the labels.
 	 */
-	function js_createLabels( $lang ) {
+	protected function js_createLabels( $lang ) {
 
 		return '
 function InitWecMapGoogleV3Labels() {
@@ -841,7 +827,7 @@ function js_setMapType($type) {
 	 * @return string The javascript output
 	 **/
 	function js_loadCalls() {
-		$loadCalls .= 'if(document.getElementById("'.$this->mapName.'_radiusform") != null) document.getElementById("'.$this->mapName.'_radiusform").style.display = "";';
+		$loadCalls = 'if(document.getElementById("'.$this->mapName.'_radiusform") != null) document.getElementById("'.$this->mapName.'_radiusform").style.display = "";';
 		$loadCalls .= 'if(document.getElementById("'.$this->mapName.'_sidebar") != null) document.getElementById("'.$this->mapName.'_sidebar").style.display = "";';
 		$loadCalls .= 'document.getElementById("'.$this->mapName.'").style.height="'.$this->height.'px";';
 		return $loadCalls;
@@ -1086,6 +1072,3 @@ function js_setMapType($type) {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/map_service/google/class.tx_wecmap_map_google.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/map_service/google/class.tx_wecmap_map_google.php']);
 }
-
-
-?>

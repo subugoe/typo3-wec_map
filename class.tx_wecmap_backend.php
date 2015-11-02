@@ -28,25 +28,16 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_map.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_cache.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'map_service/google/class.tx_wecmap_map_google.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
 /**
  * General purpose backend class for the WEC Map extension.  This class
  * provides user functions for displaying geocode status and maps within
  * TCEForms.
  *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_backend {
 
 	static function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, &$reference) {
 		global $TCA;
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
 
 		$tca = &$TCA[$table]['ctrl']['EXT']['wec_map'];
 		$isMappable = $tca['isMappable'];
@@ -82,9 +73,8 @@ class tx_wecmap_backend {
 		}
 	}
 
-	static function processDatamap_preProcessFieldArray(array &$incomingFieldArray, $table, $id, t3lib_TCEmain &$reference) {
+	static function processDatamap_preProcessFieldArray(array &$incomingFieldArray, $table, $id, \TYPO3\CMS\Core\DataHandling\DataHandler &$reference) {
 		global $TCA;
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
 
 		$tca = $TCA[$table]['ctrl']['EXT']['wec_map'];
 		$isMappable = $tca['isMappable'];
@@ -118,7 +108,7 @@ class tx_wecmap_backend {
 	 * drawGeocodeStatus().
 	 *
 	 * @param	array	Array with information about the current field.
-	 * @param	object	Parent object.  Instance of t3lib_tceforms.
+	 * @param	object	Parent object.
 	 * @return	string	HTML output of current geocoding status and editing form.
 	 */
 	static function checkGeocodeStatus($PA, &$fobj) {
@@ -140,7 +130,7 @@ class tx_wecmap_backend {
 	 * drawLatlongStatus().
 	 *
 	 * @param	array	Array with information about the current field.
-	 * @param	object	Parent object.  Instance of t3lib_tceforms.
+	 * @param	object	Parent object.
 	 * @return	string	HTML output of current geocoding status and editing form.
 	 */
 	static function checkLatLongStatus($PA, &$fobj) {
@@ -159,7 +149,7 @@ class tx_wecmap_backend {
 	 * drawGeocodeStatus().
 	 *
 	 * @param	array	Array with information about the current FlexForm.
-	 * @param	object	Parent object.  Instance of t3lib_tceforms.
+	 * @param	object	Parent object.
 	 * @return	string	HTML output of current geocoding status and editing form.
 	 * @todo	Does our method of digging into FlexForms mess up localization?
 	 */
@@ -270,7 +260,7 @@ class tx_wecmap_backend {
 	/**
 	 * Draws a backend map.
 	 * @param		array		Array with information about the current field.
-	 * @param		object		Parent object.  Instance of t3lib_tceforms.
+	 * @param		object		Parent object.
 	 * @return		string		HTML to display the map within a backend record.
 	 */
 	static function drawMap($PA, $fobj) {
@@ -304,8 +294,8 @@ class tx_wecmap_backend {
 
 	/**
 	 * Draws a backend map.
-	 * @param		array		Array with information about the current field.
-	 * @param		object		Parent object.  Instance of t3lib_tceforms.
+	 * @param		array	$PA	Array with information about the current field.
+	 * @param		object	$fobj	Parent object.
 	 * @return		string		HTML to display the map within a backend record.
 	 */
 	static function drawLatLongMap($PA, $fobj) {
@@ -316,8 +306,9 @@ class tx_wecmap_backend {
 		$long = self::getFieldValue('long', $PA);
 
 		$description = $lat.','.$long;
+		/** @var \tx_wecmap_map_google $map */
+		$map =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_map_google::class, $apiKey, $width, $height);
 
-		$map =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'tx_wecmap_map_google', $apiKey, $width, $height);
 		$marker = $map->addMarkerByLatLong($lat, $long, $description );
 		// enable dragging to correct lat/long interactively
 		if ( $marker )
@@ -426,13 +417,13 @@ class tx_wecmap_backend {
 	/**
 	 * Gets extConf from TYPO3_CONF_VARS and returns the specified key.
 	 *
-	 * @param	string	The key to look up in extConf.
+	 * @param	string	$key The key to look up in extConf.
 	 * @return	mixed	The value of the specified key.
 	 */
 	static function getExtConf($key) {
-		/* Make an instance of the Typoscript parser */
-		# require_once(PATH_t3lib.'class.t3lib_tsparser.php');
-		$tsParser =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TSparser');
+
+		/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
+		$tsParser =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
 
 		/* Unserialize the TYPO3_CONF_VARS and extract the value using the parser */
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['wec_map']);
@@ -459,7 +450,6 @@ class tx_wecmap_backend {
 		global $LANG;
 
 		foreach( $GLOBALS['TCA'] as $table => $conf ) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
 			$isMappable = $conf['ctrl']['EXT']['wec_map']['isMappable'];
 			if($isMappable) {
 				$title = $LANG->sL($conf['ctrl']['title']);
@@ -474,5 +464,3 @@ class tx_wecmap_backend {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_backend.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_backend.php']);
 }
-
-?>

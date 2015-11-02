@@ -31,19 +31,12 @@
 /**
  * General purpose class for the WEC Map extension.  This class
  * provides shared methods used by other classes
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_shared {
 
 	static function render($data, $conf, $table = '') {
-		#if (!defined('PATH_tslib')) define('PATH_tslib', \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cms').'tslib/');
-		#require_once(PATH_tslib.'class.tslib_content.php');
-		$local_cObj =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tslib_cObj'); // Local cObj.
+		$local_cObj =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class); // Local cObj.
 		$local_cObj->start($data, $table );
-    //$output = tx_wecmap_shared::cObjGet($conf, $local_cObj);
     $output = $local_cObj->cObjGet($conf);
 
 		return $output;
@@ -81,12 +74,10 @@ class tx_wecmap_shared {
 	}
 
 	static function getAddressField($table, $field) {
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
  		return $GLOBALS['TCA'][$table]['ctrl']['EXT']['wec_map']['addressFields'][$field];
 	}
 
 	static function getLatLongField($table, $field) {
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
  		return $GLOBALS['TCA'][$table]['ctrl']['EXT']['wec_map']['latlongFields'][$field];
 	}
 }
@@ -94,4 +85,3 @@ class tx_wecmap_shared {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_shared.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_shared.php']);
 }
-?>

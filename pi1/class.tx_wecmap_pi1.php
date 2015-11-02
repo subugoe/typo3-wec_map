@@ -28,23 +28,9 @@
 ***************************************************************/
 
 /**
- * Plugin 'Map' for the 'wec_map' extension.
- *
- * @author	Web-Empowered Church Team <map@webempoweredchurch.org>
- */
-
-
-#require_once(PATH_tslib.'class.tslib_pibase.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
-/**
  * Simple frontend plugin for displaying an address on a map.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
-class tx_wecmap_pi1 extends tslib_pibase {
+class tx_wecmap_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	var $prefixId = 'tx_wecmap_pi1';		// Same as class name
 	var $scriptRelPath = 'pi1/class.tx_wecmap_pi1.php';	// Path to this script relative to the extension dir.
 	var $extKey = 'wec_map';	// The extension key.
@@ -53,8 +39,8 @@ class tx_wecmap_pi1 extends tslib_pibase {
 
 	/**
 	 * Draws a Google map based on an address entered in a Flexform.
-	 * @param	array		Content array.
-	 * @param	array		Conf array.
+	 * @param	array	$content	Content array.
+	 * @param	array	$conf	Conf array.
 	 * @return	string	HTML / Javascript representation of a Google map.
 	 */
 	function main($content,$conf)	{
@@ -62,35 +48,25 @@ class tx_wecmap_pi1 extends tslib_pibase {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 
+		$out = '';
+
 		// check for WEC Map API static template inclusion
 		if(empty($conf['output']) && !(empty($conf['marker.']['title']) && empty($conf['marker.']['description']))) {
 			global $LANG;
-			if(!is_object($LANG)) {
-				#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-				$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-				$LANG->init($GLOBALS['TSFE']->config['config']['language']);
-			}
+
 			$LANG->includeLLFile('EXT:wec_map/locallang_db.xml');
 			$out .= $LANG->getLL('wecApiTemplateNotIncluded');
-			// syslog start
 				\TYPO3\CMS\Core\Utility\GeneralUtility::sysLog('WEC Map API template not included on page id '.$GLOBALS['TSFE']->id, 'wec_map', 3);
-			// syslog end
 			return $out;
 		}
 
 		// check for WEC Simple Map static template inclusion
 		if(empty($conf['marker.']['title']) && empty($conf['marker.']['description'])) {
 			global $LANG;
-			if(!is_object($LANG)) {
-#				require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-				$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-				$LANG->init($GLOBALS['TSFE']->config['config']['language']);
-			}
+
 			$LANG->includeLLFile('EXT:wec_map/locallang_db.xml');
 			$out .= $LANG->getLL('pi1TemplateNotIncluded');
-			// syslog start
 				\TYPO3\CMS\Core\Utility\GeneralUtility::sysLog('WEC Simple Map template not included on page id '.$GLOBALS['TSFE']->id, 'wec_map', 3);
-			// syslog end
 			return $out;
 		}
 
@@ -172,8 +148,7 @@ class tx_wecmap_pi1 extends tslib_pibase {
 		$description = $this->pi_getFFvalue($piFlexForm, 'description', 'default');
 
 		/* Create the map class and add markers to the map */
-		#include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'map_service/google/class.tx_wecmap_map_google.php');
-		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_map_google', null, $width, $height, $centerLat, $centerLong, $zoomLevel, $mapName);
+		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_map_google::class, null, $width, $height, $centerLat, $centerLong, $zoomLevel, $mapName);
 
 		// evaluate config to see which map controls we need to show
 		if($mapControlSize == 'large') {
@@ -345,10 +320,6 @@ class tx_wecmap_pi1 extends tslib_pibase {
 	}
 }
 
-
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi1/class.tx_wecmap_pi1.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi1/class.tx_wecmap_pi1.php']);
 }
-
-?>

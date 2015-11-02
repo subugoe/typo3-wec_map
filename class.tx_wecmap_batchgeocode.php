@@ -27,15 +27,8 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_cache.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
 /**
  * Performs autmated geocoding for any address information.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_batchgeocode {
 
@@ -47,8 +40,6 @@ class tx_wecmap_batchgeocode {
 
 	/**
 	 * Default constructor.
-	 *
-	 * @return		none
 	 */
 	function tx_wecmap_batchgeocode($limit=10) {
 		$this->tables = array();
@@ -60,8 +51,7 @@ class tx_wecmap_batchgeocode {
 	/**
 	 * Adds a specific tables to the list of tables that should be geocoded.
 	 *
-	 * @param		string		The name of the table.
-	 * @return		none
+	 * @param		string	$table	The name of the table.
 	 */
 	function addTable($table) {
 		$this->tables[] = $table;
@@ -71,8 +61,6 @@ class tx_wecmap_batchgeocode {
 	/**
 	 * Traverses the TCA and adds all mappable tables to the list of tables that
 	 * should be geocoded.
-	 *
-	 * @return		none
 	 */
 	function addAllTables() {
 		global $TCA;
@@ -86,8 +74,6 @@ class tx_wecmap_batchgeocode {
 
 	/**
 	 * Main function to initiate geocoding of all address-related tables.
-	 *
-	 * @return		none
 	 */
 	function geocode() {
 		foreach($this->tables as $table) {
@@ -219,5 +205,3 @@ class tx_wecmap_batchgeocode {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_batchgeocode.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_batchgeocode.php']);
 }
-
-?>

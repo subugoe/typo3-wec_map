@@ -30,33 +30,20 @@
 *
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
-/**
- * Service 'Google Maps V3 Address Lookup' for the 'wec_map' extension.
- *
- * @author	j.bartels
- */
-
-
-#require_once(PATH_t3lib.'class.t3lib_svbase.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_domainmgr.php');
 
 /**
  * Service providing lat/long lookup via the Google Maps web service.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
-class tx_wecmap_geocode_google extends t3lib_svbase {
-	var $prefixId = 'tx_wecmap_geocode_google';		// Same as class name
-	var $scriptRelPath = 'geocode_service/class.tx_wecmap_geocode_google.php';	// Path to this script relative to the extension dir.
-	var $extKey = 'wec_map';	// The extension key.
+class tx_wecmap_geocode_google extends \TYPO3\CMS\Core\Service\AbstractService {
+	var $prefixId = 'tx_wecmap_geocode_google';
+	var $scriptRelPath = 'geocode_service/class.tx_wecmap_geocode_google.php';
+	var $extKey = 'wec_map';
 
 	/**
 	 * Returns the type of an iso code: nr, 2, 3
 	 * code copied from static_info_tables
 	 *
-	 * @param	string		iso code
+	 * @param	string	$isoCode	iso code
 	 * @return	string		iso code type
 	 */
 	protected static function isoCodeType ($isoCode) {
@@ -77,10 +64,10 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 	 * in different languages. Parameters might be left empty.
 	 * code copied from static_info_tables
 	 *
-	 * @param	string		a name of the country or a part of it in any language
-	 * @param	string		ISO alpha-2 code of the country
-	 * @param	string		ISO alpha-3 code of the country
-	 * @param	array		Database row.
+	 * @param	string	$country	a name of the country or a part of it in any language
+	 * @param	string	$iso2	ISO alpha-2 code of the country
+	 * @param	string	$iso3	ISO alpha-3 code of the country
+	 * @param	array	$isonr	Database row.
 	 * @return	array		Array of rows of country records
 	 */
 	protected static function fetchCountries ($country, $iso2='', $iso3='', $isonr='') {
@@ -121,12 +108,12 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 	/**
 	 * Performs an address lookup using the google web service.
 	 *
-	 * @param	string	The street address.
-	 * @param	string	The city name.
-	 * @param	string	The state name.
-	 * @param	string	The ZIP code.
-	 * @param	string	Optional API key for accessing third party geocoder.
-	 * @return	array		Array containing latitude and longitude.  If lookup failed, empty array is returned.
+	 * @param	string $street	The street address.
+	 * @param	string $city	The city name.
+	 * @param	string $state	The state name.
+	 * @param	string $zip	The ZIP code.
+	 * @param	string $country	Optional API key for accessing third party geocoder.
+	 * @return	array $key		Array containing latitude and longitude.  If lookup failed, empty array is returned.
 	 */
 	function lookup($street, $city, $state, $zip, $country, $key='')	{
 
@@ -136,10 +123,6 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 		if ( \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables') )
 		{
 			// format address for Google search based on local address-format for given $country
-
-			// load and init Static Info Tables
-			#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('static_info_tables').'class.tx_staticinfotables_div.php');
-
 			// convert $country to ISO3
 			$countryCodeType = self::isoCodeType($country);
 			if       ($countryCodeType == 'nr') {
@@ -193,31 +176,14 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 		if ( !$addressString )
 		{
 			$addressString = $street.' '.$city.', '.$state.' '.$zip.', '.$country;	// default: US-format
-			// $addressString = $street.','.$zip.' '.$city.','.$country;  			// Alternative German format for better search results
 		}
 
 		// build URL
 		$lookupstr = trim( $addressString );
-	  	# Google requires utf-8; convert query if neccessary
-//	  	if ( $GLOBALS['TSFE']->renderCharset != 'utf-8' )
-//    		$lookupstr = utf8_encode( $lookupstr );
 
 		$url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' . urlencode( $lookupstr );
 		if ( $region )
 			$url .= '&region=' . urlencode( $region );
-
-		/*
-		// Digital signatures for Premier Accounts not yet supported!
-		if(!$key) {
-			$domainmgr = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_domainmgr');
-			$key = $domainmgr->getKeyV3();
-		}
-		$url .= 'clientId=' . $clientId;
-		$signature = modified_base64( hmac( ... $key ... $url ... ) )
-		// see http://gmaps-samples.googlecode.com/svn/trunk/urlsigning/UrlSigner.php-source
-
-		$url .= '&signature=' . $signature;
-		*/
 
 		// request Google-service and parse JSON-response
 		if(TYPO3_DLOG) {
@@ -290,20 +256,20 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 	/**
 	 * Formatting an address in the format specified
 	 *
-	 * @param	string		A delimiter for the fields of the returned address
-	 * @param	string		A street address
-	 * @param	string		A city
-	 * @param	string		A country subdivision code (zn_code)
-	 * @param	string		A ISO alpha-3 country code (cn_iso_3)
-	 * @param	string		A zip code
+	 * @param	string	$delim	A delimiter for the fields of the returned address
+	 * @param	string	$streetAddress	A street address
+	 * @param	string	$city	A city
+	 * @param	string	$zip	A zip code
+	 * @param	string	$subdivisionCode	A ISO alpha-3 country code (cn_iso_3)
+	 * @param	string	$countryCode	A zip code	A country subdivision code (zn_code)
 	 * @return	string		The formated address using the country address format (cn_address_format)
 	 */
 	function formatAddress ($delim, $streetAddress, $city, $zip, $subdivisionCode='', $countryCode='')	{
 
 		if(TYPO3_MODE == 'FE')
 		{
-			#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('static_info_tables').'pi1/class.tx_staticinfotables_pi1.php');
-			$staticInfoObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+			/** @var \SJBR\StaticInfoTables\PiBaseApi $staticInfoObj */
+			$staticInfoObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\SJBR\StaticInfoTables\PiBaseApi::class);
 			if ($staticInfoObj->needsInit()) {
 				$staticInfoObj->init();
 			}
@@ -319,8 +285,7 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 		$subdivisionCode = ($subdivisionCode ? trim($subdivisionCode) : ($countryCode == $this->defaultCountry ? $this->defaultCountryZone : ''));
 
 		// Get country name
-//		$countryName = $this->getStaticInfoName('COUNTRIES', $countryCode);
-		$countryName = tx_staticinfotables_div::getTitleFromIsoCode('static_countries', $countryCode, '', FALSE);
+		$countryName = \SJBR\StaticInfoTables\Utility\LocalizationUtility::getLabelFieldValue($countryCode, 'static_countries', '', FALSE);
 		if (!$countryName) {
 			return $formatedAddress;
 		}
@@ -334,10 +299,6 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 		$row = $TYPO3_DB->sql_fetch_assoc($res);
 		$TYPO3_DB->sql_free_result($res);
 		$addressFormat = $row['cn_address_format'];
-
-			// Get country subdivision name
-//		$countrySubdivisionName = $this->getStaticInfoName('SUBDIVISIONS', $subdivisionCode, $countryCode);
-//		$countrySubdivisionName = tx_staticinfotables_div::getTitleFromIsoCode('static_country_zones', $subdivisionCode, $countryCode, FALSE);
 
 		// Format the address
 		$formatedAddress = $conf['addressFormat.'][$addressFormat];
@@ -360,14 +321,14 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 	 * @return array
 	 */
 	function loadTypoScriptForBEModule($extKey) {
-		#require_once(PATH_t3lib . 'class.t3lib_page.php');
-		#require_once(PATH_t3lib . 'class.t3lib_tstemplate.php');
-		#require_once(PATH_t3lib . 'class.t3lib_tsparser_ext.php');
 		list($page) = \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordsByField('pages', 'pid', 0);
 		$pageUid = intval($page['uid']);
-		$sysPageObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_pageSelect');
+		/** @var \TYPO3\CMS\Frontend\Page\PageRepository $sysPageObj */
+		$sysPageObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\Page\PageRepository::class);
 		$rootLine = $sysPageObj->getRootLine($pageUid);
-		$TSObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_tsparser_ext');
+
+		/** @var \TYPO3\CMS\Core\TypoScript\ExtendedTemplateService $TSObj */
+		$TSObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\ExtendedTemplateService::class);
 		$TSObj->tt_track = 0;
 		$TSObj->init();
 		$TSObj->runThroughTemplates($rootLine);
@@ -377,10 +338,6 @@ class tx_wecmap_geocode_google extends t3lib_svbase {
 
 }
 
-
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/geocode_service/class.tx_wecmap_geocode_google.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/geocode_service/class.tx_wecmap_geocode_google.php']);
 }
-
-?>

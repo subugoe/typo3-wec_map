@@ -49,5 +49,3 @@ $TCA["tx_wecmap_external"] = Array (
 		"1" => Array("showitem" => "title, url"),
 	),
 );
-
-?>

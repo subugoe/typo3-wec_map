@@ -26,35 +26,22 @@
 *
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
-/**
- * Plugin 'Frontend User Map' for the 'wec_map' extension.
- *
- * @author	Web-Empowered Church Team <map@webempoweredchurch.org>
- */
-
-
-#require_once(PATH_tslib.'class.tslib_pibase.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
 
 /**
  * Frontend User Map plugin for displaying all frontend users on a map.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
-class tx_wecmap_pi2 extends tslib_pibase {
-	var $prefixId = 'tx_wecmap_pi2';		// Same as class name
-	var $scriptRelPath = 'pi2/class.tx_wecmap_pi2.php';	// Path to this script relative to the extension dir.
-	var $extKey = 'wec_map';	// The extension key.
+class tx_wecmap_pi2 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
+	var $prefixId = 'tx_wecmap_pi2';
+	var $scriptRelPath = 'pi2/class.tx_wecmap_pi2.php';
+	var $extKey = 'wec_map';
 	var $pi_checkCHash = TRUE;
 	var $sidebarLinks = array();
 
 	/**
 	 * Draws a Google map containing all frontend users of a website.
 	 *
-	 * @param	array		The content array.
-	 * @param	array		The conf array.
+	 * @param	array	$content	The content array.
+	 * @param	array	$conf	The conf array.
 	 * @return	string	HTML / Javascript representation of a Google map.
 	 */
 	function main($content,$conf)	{
@@ -62,14 +49,12 @@ class tx_wecmap_pi2 extends tslib_pibase {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 
+		$out = '';
+
 		// check for WEC Map API static template inclusion
 		if(empty($conf['output']) && !(empty($conf['marker.']['title']) && empty($conf['marker.']['description']))) {
 			global $LANG;
-			if(!is_object($LANG)) {
-#				require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-				$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-				$LANG->init($GLOBALS['TSFE']->config['config']['language']);
-			}
+
 			$LANG->includeLLFile('EXT:wec_map/locallang_db.xml');
 			$out .= $LANG->getLL('wecApiTemplateNotIncluded');
 			// syslog start
@@ -81,16 +66,10 @@ class tx_wecmap_pi2 extends tslib_pibase {
 		// check for WEC FE Map static template inclusion
 		if(empty($conf['marker.']['title']) && empty($conf['marker.']['description'])) {
 			global $LANG;
-			if(!is_object($LANG)) {
-#				require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-				$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-				$LANG->init($GLOBALS['TSFE']->config['config']['language']);
-			}
+
 			$LANG->includeLLFile('EXT:wec_map/locallang_db.xml');
 			$out .= $LANG->getLL('pi2TemplateNotIncluded');
-			// syslog start
 				\TYPO3\CMS\Core\Utility\GeneralUtility::sysLog('WEC FE User template not included on page id '.$GLOBALS['TSFE']->id, 'wec_map', 3);
-			// syslog end
 			return $out;
 		}
 
@@ -174,9 +153,8 @@ class tx_wecmap_pi2 extends tslib_pibase {
 		if(empty($mapName)) $mapName = 'map'.$this->cObj->data['uid'];
 		$this->mapName = $mapName;
 
-		/* Create the Map object */
-		#include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'map_service/google/class.tx_wecmap_map_google.php');
-		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_map_google', null, $width, $height, $centerLat, $centerLong, $zoomLevel, $mapName);
+		/** @var \tx_wecmap_map_google $map */
+		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_map_google::class, null, $width, $height, $centerLat, $centerLong, $zoomLevel, $mapName);
 
 		// get kml urls for each included record
 		if(!empty($kml)) {
@@ -505,5 +483,3 @@ class tx_wecmap_pi2 extends tslib_pibase {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi2/class.tx_wecmap_pi2.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi2/class.tx_wecmap_pi2.php']);
 }
-
-?>

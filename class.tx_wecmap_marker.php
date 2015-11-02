@@ -30,27 +30,23 @@
 /**
  * Main class for the wec_map extension.  This class sits between the various
  * frontend plugins and address lookup service to render map data.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_marker {
-	var $index;
+	public $index;
 
-	var $latitude;
-	var $longitude;
-	var $minzoom = 0;
-	var $maxzoom;
-	var $title;
-	var $description;
-	var $color;
-	var $strokeColor;
-	var $mapName;
-	var $map = null;
-	var $iconID;
-	var $groupId = -1;
-	var $directionsMenuConf;
+	public $latitude;
+	public $longitude;
+	public $minzoom = 0;
+	public $maxzoom;
+	public $title;
+	public $description;
+	public $color;
+	public $strokeColor;
+	public $mapName;
+	public $map = null;
+	public $iconID;
+	public $groupId = -1;
+	public $directionsMenuConf;
 
 	/**
 	 * Constructor stub. See map_service classes for more details on the marker
@@ -193,6 +189,3 @@ class tx_wecmap_marker {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_marker.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_marker.php']);
 }
-
-
-?>

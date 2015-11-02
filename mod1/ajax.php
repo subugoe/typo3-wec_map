@@ -29,10 +29,6 @@
 
 /**
  * Module 'WEC Map Admin' for the 'wec_map' extension.
- *
- * @author	j.bartels
- * @package	TYPO3
- * @subpackage	tx_wecmap
  */
 class  tx_wecmap_module1_ajax {
 
@@ -109,7 +105,7 @@ class  tx_wecmap_module1_ajax {
 
 	function ajaxBatchGeocode($params, &$ajaxObj) {
 
-		$batchGeocode = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_batchgeocode');
+		$batchGeocode = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_batchgeocode::class);
 
 		// add all tables to check which ones need geocoding and do it
 		$batchGeocode->addAllTables();
@@ -140,11 +136,6 @@ class  tx_wecmap_module1_ajax {
 			$progressBarWidth = round($processedAddresses / $totalAddresses * 100);
 		}
 
-		if(!is_object($LANG)) {
-			#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-			$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
-			$LANG->init($BE_USER->uc['lang']);
-		}
 		$LANG->includeLLFile('EXT:wec_map/mod1/locallang.xml');
 
 		$content = array();
@@ -170,9 +161,6 @@ class  tx_wecmap_module1_ajax {
 
 }
 
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod1/index.php'])	{
 include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod1/index.php']);
 }
-
-?>

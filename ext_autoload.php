@@ -1,7 +1,7 @@
 <?php
 $extensionClassesPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map');
 
-$default = array(
+return array(
         'tx_wecmap_shared'  => $extensionClassesPath . 'class.tx_wecmap_shared.php',
         'tx_wecmap_backend'  => $extensionClassesPath . 'class.tx_wecmap_backend.php',
         'tx_wecmap_batchgeocode'  => $extensionClassesPath . 'class.tx_wecmap_batchgeocode.php',
@@ -19,5 +19,3 @@ $default = array(
         'tx_wecmap_module1' => $extensionClassesPath . 'mod1/index.php',
         'tx_wecmap_module1_ajax' => $extensionClassesPath . 'mod1/ajax.php',
 );
-return $default;
-?>

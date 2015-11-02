@@ -28,59 +28,42 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_marker.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_backend.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
 /**
  * Marker implementation for the Google Maps mapping service.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_marker_google extends tx_wecmap_marker {
-	var $index;
+	public $index;
 
-	var $latitude;
-	var $longitude;
+	public $latitude;
+	public $longitude;
 
-	var $title;
-	var $description;
-	var $color;
-	var $strokeColor;
-	var $prefillAddress;
-	var $tabLabels;
-	var $iconID;
+	public $title;
+	public $description;
+	public $color;
+	public $strokeColor;
+	public $prefillAddress;
+	public $tabLabels;
+	public $iconID;
 
 	/**
 	 * Constructor for the Google Maps marker class.
 	 *
 	 * @access	public
-	 * @param	integer		Index within the overall array of markers.
-	 * @param	float		Latitude of the marker location.
-	 * @param	float		Longitude of the marker location.
-	 * @param	string		Title of the marker.
-	 * @param	string		Description of the marker.
-	 * @param 	boolean		Sets whether the directions address should be prefilled with logged in user's address
-	 * @param	array 		Labels used on tabs. Optional.
-	 * @param	string		Unused for Google Maps.
-	 * @param	string		Unused for Google Maps.
-	 * @return	none
+	 * @param	integer	$index	Index within the overall array of markers.
+	 * @param	float	$latitude	Latitude of the marker location.
+	 * @param	float	$longitude	Longitude of the marker location.
+	 * @param	string	$title	Title of the marker.
+	 * @param	string	$description	Description of the marker.
+	 * @param 	boolean	$prefillAddress	Sets whether the directions address should be prefilled with logged in user's address
+	 * @param	array 	$tabLabels	Labels used on tabs. Optional.
+	 * @param	string	$color	Unused for Google Maps.
+	 * @param	string	$strokeColor	Unused for Google Maps.
+	 * @param	int	$iconId	Icon Id
 	 */
 	function tx_wecmap_marker_google($index, $latitude, $longitude, $title, $description, $prefillAddress = false, $tabLabels=null, $color='0xFF0000', $strokeColor='0xFFFFFF', $iconID='') {
 
 		global $LANG;
-		if(!is_object($LANG)) {
-			#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang').'lang.php');
-			$LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('language');
 
-			if(TYPO3_MODE == 'BE') {
-				$LANG->init($BE_USER->uc['lang']);
-			} else {
-				$LANG->init($GLOBALS['TSFE']->config['config']['language']);
-			}
-		}
 		$LANG->includeLLFile('EXT:wec_map/locallang_db.xml');
 
 		$this->index = $index;
@@ -228,11 +211,9 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 		$this->tabLabels[] = $tabLabel;
 		$this->title[] = $title;
 		$this->description[] = $description;
-		// TODO: devlog start
 		if(TYPO3_DLOG) {
 			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': manually adding tab to marker '.$this->index.' with title '. $title, 'wec_map_api');
 		}
-		// devlog end
 	}
 
 	/**
@@ -248,14 +229,14 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 
 				if(!empty($feuser_id)) {
 					$table = 'fe_users';
-					$streetField  = tx_wecmap_shared::getAddressField($table, 'street');
-					$cityField    = tx_wecmap_shared::getAddressField($table, 'city');
-					$stateField   = tx_wecmap_shared::getAddressField($table, 'state');
-					$zipField     = tx_wecmap_shared::getAddressField($table, 'zip');
-					$countryField = tx_wecmap_shared::getAddressField($table, 'country');
+					$streetField  = \tx_wecmap_shared::getAddressField($table, 'street');
+					$cityField    = \tx_wecmap_shared::getAddressField($table, 'city');
+					$stateField   = \tx_wecmap_shared::getAddressField($table, 'state');
+					$zipField     = \tx_wecmap_shared::getAddressField($table, 'zip');
+					$countryField = \tx_wecmap_shared::getAddressField($table, 'country');
 
 
-					$select = $streetField.', '.$cityField.', '.$stateField.', '.$zipField.', '.$country;
+					$select = $streetField.', '.$cityField.', '.$stateField.', '.$zipField.', '.$countryField;
 					$selectArray = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $select, true);
 					$select = implode(',', $selectArray);
 
@@ -275,11 +256,9 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 	 * @return String
 	 **/
 	function getClickJS() {
-		// TODO: devlog start
 		if(TYPO3_DLOG) {
 			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': adding marker '.$this->index.'('.strip_tags($this->title[0]).strip_tags($this->description[0]).') to sidebar', 'wec_map_api');
 		}
-		// devlog end
 		return 'WecMap.jumpTo(\'' . $this->mapName . '\', ' . $this->groupId . ', ' . $this->index . ', ' . $this->calculateClickZoom() . ');';
 	}
 
@@ -312,7 +291,7 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 	 * Converts newlines to <br/> tags.
 	 *
 	 * @access	private
-	 * @param	string		The input string to filtered.
+	 * @param	string	$input	The input string to filtered.
 	 * @return	string		The converted string.
 	 */
 	function filterNL2BR($input) {
@@ -325,7 +304,7 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 	 * strip newlines
 	 *
 	 * @access	private
-	 * @param	string		The input string to filtered.
+	 * @param	string	$input	The input string to filtered.
 	 * @return	string		The converted string.
 	 */
 	function stripNL($input) {
@@ -340,6 +319,3 @@ WecMap.addBubble( "' . $this->mapName . '", ' . $this->groupId . ', ' . $this->i
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/map_service/google/class.tx_wecmap_marker_google.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/map_service/google/class.tx_wecmap_marker_google.php']);
 }
-
-
-?>

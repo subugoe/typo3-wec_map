@@ -27,21 +27,14 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-	// DEFAULT initialization of a module [BEGIN]
-$LANG->includeLLFile('EXT:wec_map/mod2/locallang.xml');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/Module/BaseScriptClass.php');
-$BE_USER->modAccess($MCONF, 1);	// This checks permissions and exits if the users has no permission for entry.
-	// DEFAULT initialization of a module [END]
+$GLOBALS['LANG']->includeLLFile('EXT:wec_map/mod2/locallang.xml');
+$GLOBALS['BE_USER']->modAccess($MCONF, 1);	// This checks permissions and exits if the users has no permission for entry.
 
 /**
  * Module 'Map FE Users' for the 'wec_map' extension.
- *
- * @author	Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package	TYPO3
- * @subpackage	tx_wecmap
  */
-class  tx_wecmap_module1 extends t3lib_SCbase {
-	var $pageinfo;
+class  tx_wecmap_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
+	public $pageinfo;
 
 	/**
 	 * Initializes the Module
@@ -51,12 +44,6 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 
 		parent::init();
-
-		/*
-		if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('clear_all_cache'))	{
-			$this->include_once[] = PATH_t3lib.'class.t3lib_tcemain.php';
-		}
-		*/
 	}
 
 	/**
@@ -78,8 +65,6 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 	/**
 	 * Main function of the module. Write the content to $this->content
 	 * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
-	 *
-	 * @return	[type]		...
 	 */
 	function main()	{
 		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
@@ -92,7 +77,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id) || ($BE_USER->user['uid'] && !$this->id)) {
 
 				// Draw the header.
-			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Template\DocumentTemplate::class);
 			$this->doc->docType = 'xhtml_trans';
 			$this->doc->backPath = $BACK_PATH;
 			$this->doc->form='<form action="" method="post">';
@@ -142,7 +127,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		} else {
 				// If no access or if ID == zero
 
-			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Template\DocumentTemplate::class);
 			$this->doc->backPath = $BACK_PATH;
 
 			$this->content.=$this->doc->startPage($LANG->getLL('title'));
@@ -324,7 +309,6 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		$height = 500;
 		$conf = $GLOBALS['BE_USER']->getModuleData('tools_txwecmapM2');
 
-
 		// get options
 		$scale = $conf['scale'];
 		$minimap = $conf['minimap'];
@@ -337,8 +321,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		$zipField     = tx_wecmap_shared::getAddressField('fe_users', 'zip');
 		$countryField = tx_wecmap_shared::getAddressField('fe_users', 'country');
 
-		#include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'map_service/google/class.tx_wecmap_map_google.php');
-		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_map_google', $apiKey, $width, $height);
+		$map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_map_google::class, $apiKey, $width, $height);
 
 		// evaluate map controls based on configuration
 		switch ($mapcontrolsize) {
@@ -437,34 +420,24 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 	function returnEditLink($uid,$title) {
 		$tablename = 'fe_users';
 		$params = '&edit['.$tablename.']['.$uid.']=edit';
-		$out .=    '<a href="#" onclick="'.
+		$out =    '<a href="#" onclick="'.
 		\TYPO3\CMS\Backend\Utility\BackendUtility::editOnClick($params,$GLOBALS['BACK_PATH']).
 		'">';
 		$out .= $title;
-		$out .= '<img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="Edit me" border="0" alt="" />';
+		$out .= '<img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="Edit me" border="0" alt="" />';
 		$out .= '</a>';
 		return $out;
 	}
 
 }
 
-
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod2/index.php'])	{
 include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod2/index.php']);
 }
 
-
-
-
 // Make instance:
-$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_module1');
+$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_module1::class);
 $SOBE->init();
-
-// Include files?
-foreach($SOBE->include_once as $INC_FILE)	include_once($INC_FILE);
 
 $SOBE->main();
 $SOBE->printContent();
-
-?>

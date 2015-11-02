@@ -28,5 +28,3 @@ $GLOBALS ['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['pro
 		'className' => 'tx_wecmap_geocode_google',
 	)
 );
-
-?>

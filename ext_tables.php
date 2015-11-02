@@ -1,9 +1,6 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
-#require_once(PATH_tslib . 'class.tslib_pibase.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_backend.php');
-
 if (TYPO3_MODE=='BE')    {
 	/* Add the backend modules */
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule('tools','txwecmapM1','',\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'mod1/');
@@ -16,7 +13,6 @@ if (TYPO3_MODE=='BE')    {
 }
 
 /* Set up the tt_content fields for the two frontend plugins */
-\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('tt_content');
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1']='layout,select_key,pages,recursive';
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi2']='layout,select_key,pages,recursive';
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi3']='layout,select_key,pages,recursive';
@@ -63,7 +59,6 @@ $TCA['tx_wecmap_external'] = Array (
 
 
 /* Define the address related fields for a frontend user */
-\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('fe_users');
 if(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('sr_feuser_register')) {
 	$TCA['fe_users']['ctrl']['EXT']['wec_map'] = array (
 		'isMappable' => 1,
@@ -89,7 +84,6 @@ if(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('sr_feuser_regis
 }
 
 if(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_address')) {
-	\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('tt_address');
 	$TCA['tt_address']['ctrl']['EXT']['wec_map'] = array (
 		'isMappable' => 1,
 		'addressFields' => array (
@@ -103,7 +97,6 @@ if(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_address')) {
 }
 
 if(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('nn_address')) {
-	\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('nn_address');
 	$TCA['tx_nnaddress_domain_model_address']['ctrl']['EXT']['wec_map'] = array (
 		'isMappable' => 1,
 		'addressFields' => array (
@@ -154,5 +147,3 @@ if(tx_wecmap_backend::getExtConf('geocodingStatus')) {
 	$TCA['fe_users']['interface']['showRecordFieldList'] .= ',tx_wecmap_geocode';
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('fe_users', 'tx_wecmap_geocode');
 }
-
-?>

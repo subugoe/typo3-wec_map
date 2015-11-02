@@ -27,21 +27,18 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map') . 'class.tx_wecmap_backend.php');
-#require_once(PATH_t3lib . 'class.t3lib_install.php');
-
 /**
  * Domain <=> API Key manager class for the WEC Map extension.  This class
  * provides user functions for handling domains and API keys
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_domainmgr {
 
-	var $extKey = 'wec_map';
+	public $extKey = 'wec_map';
 
+	/**
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
+	 */
+	protected $objectManager;
 
 	function getKey($domain = null) {
 
@@ -140,11 +137,7 @@ class tx_wecmap_domainmgr {
 	 * @return		array		The Google Maps API keys.
 	 */
 	function getApiKeys() {
-
-#		require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_backend.php');
-		$apiKeys = tx_wecmap_backend::getExtConf('apiKey.google');
-
-		return $apiKeys;
+		return tx_wecmap_backend::getExtConf('apiKey.google');
 	}
 
 	/*
@@ -158,19 +151,8 @@ class tx_wecmap_domainmgr {
 		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf'][$this->extKey]);
 		$extConf['apiKey.']['google'] = $dataArray;
 
-		// Instance of install tool
-		#$instObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_install');
-		#$instObj->allowUpdateLocalConf = 1;
-		#$instObj->updateIdentity = $this->extKey;
-
-		// Get lines from localconf file
-		#$lines = $instObj->writeToLocalconf_control();
-
-		#$instObj->setValueInLocalconfFile($lines, '$TYPO3_CONF_VARS[\'EXT\'][\'extConf\'][\''.$this->extKey.'\']', serialize($extConf));
-		#$instObj->writeToLocalconf_control($lines);
-
-        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
-        $instObj = $this->objectManager->get('TYPO3\CMS\Core\Configuration\ConfigurationManager');
+        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+        $instObj = $this->objectManager->get(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class);
         // Get lines from localconf file
         $lines = $instObj->getLocalConfigurationFileLocation();
         $instObj->removeLocalConfigurationKeysByPath( array( 'EXT/extConf/'.$this->extKey ) ) ;
@@ -287,5 +269,3 @@ class tx_wecmap_domainmgr {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_domainmgr.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_domainmgr.php']);
 }
-
-?>

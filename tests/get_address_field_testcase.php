@@ -34,8 +34,7 @@
  *
  *
  */
-
-class tx_wecmap_get_address_field_testcase extends tx_phpunit_testcase {
+class tx_wecmap_get_address_field_testcase extends \TYPO3\CMS\Core\Tests\Unit\Resource\BaseTestCase {
 
 	public function test_get_street_field_for_fe_users() {
 		$street = tx_wecmap_shared::getAddressField('fe_users', 'street');
@@ -65,8 +64,6 @@ class tx_wecmap_get_address_field_testcase extends tx_phpunit_testcase {
 
 	public function __construct() {
 		global $TCA;
-		#include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
 	}
 
 }
-?>

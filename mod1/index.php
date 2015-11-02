@@ -27,20 +27,13 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-	// DEFAULT initialization of a module [BEGIN]
-$LANG->includeLLFile('EXT:wec_map/mod1/locallang.xml');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('backend') . 'Classes/Module/BaseScriptClass.php');
-$BE_USER->modAccess($MCONF, 1);	// This checks permissions and exits if the users has no permission for entry.
-	// DEFAULT initialization of a module [END]
+$GLOBALS['LANG']->includeLLFile('EXT:wec_map/mod1/locallang.xml');
+$GLOBALS['BE_USER']->modAccess($MCONF, 1);	// This checks permissions and exits if the users has no permission for entry.
 
 /**
  * Module 'WEC Map Admin' for the 'wec_map' extension.
- *
- * @author	Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package	TYPO3
- * @subpackage	tx_wecmap
  */
-class  tx_wecmap_module1 extends t3lib_SCbase {
+class  tx_wecmap_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 	var $pageinfo;
 	var $extKey = 'wec_map';
 
@@ -52,12 +45,6 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 
 		parent::init();
-
-		/*
-		if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('clear_all_cache'))	{
-			#$this->include_once[] = PATH_t3lib.'class.t3lib_tcemain.php';
-		}
-		*/
 	}
 
 	/**
@@ -72,7 +59,6 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 				'1' => $LANG->getLL('function1'),
 				'2' => $LANG->getLL('function3'),
 				'3' => $LANG->getLL('function4'),
-//				'4' => $LANG->getLL('function2'),
 			)
 		);
 		parent::menuConfig();
@@ -95,7 +81,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id) || ($BE_USER->user['uid'] && !$this->id)) {
 
 				// Draw the header.
-			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Template\DocumentTemplate::class);
 			$this->doc->backPath = $BACK_PATH;
 			$this->doc->form='<form action="" method="POST">';
 
@@ -135,7 +121,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		} else {
 				// If no access or if ID == zero
 
-			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Template\DocumentTemplate::class);
 			$this->doc->backPath = $BACK_PATH;
 
 			$this->content.=$this->doc->startPage($LANG->getLL('title'));
@@ -193,8 +179,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		$count 	= $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('COUNT(*)', 'tx_wecmap_cache','');
 		$count = $count[0]['COUNT(*)'];
 
-#		require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map') . 'mod1/class.tx_wecmap_recordhandler.php');
-		$recordHandler = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_recordhandler', $count);
+		$recordHandler = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_recordhandler::class, $count);
 
 		global $LANG;
 
@@ -219,7 +204,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 	function apiKeyAdmin() {
 		global $TYPO3_CONF_VARS, $LANG;
 
-		$domainmgr = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_domainmgr');
+		$domainmgr = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_domainmgr::class);
 
 		$blankDomainValue = 'Enter domain....';
 
@@ -283,7 +268,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 			}
 
 			if($index < $number) {
-				$deleteButton = '<input type="image" '.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' onclick="document.getElementById(\'key_'. $index .'\').value = \'\';" />';
+				$deleteButton = '<input type="image" '.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' onclick="document.getElementById(\'key_'. $index .'\').value = \'\';" />';
 			} else {
 				$deleteButton = null;
 			}
@@ -299,7 +284,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 
 		$content[] = '<div id="adddomainbutton" style="margin-bottom: 15px;"><a href="#" onclick="document.getElementById(\'blank-domain\').style.display = \'block\'; document.getElementById(\'adddomainbutton\').style.display = \'none\'; document.getElementById(\'domain_'.$index.'\').value=\''. $blankDomainValue .'\';">Manually add a new API key for domain</a></div>';
 		$content[] = '<div class="domain-item" id="blank-domain" style="margin-bottom: 15px; display: none;">';
-		$content[] = '<div style="width: 35em;"><label style="display: none;" for="domain_'. $index .'">Domain: </label><input style="width: 12em;" id="domain_'. $index .'" name="domain_'. $index .'" value="" onfocus="this.value=\'\';"/> <input type="image" '.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' onclick="document.getElementById(\'key_'. $index .'\').value = \'\'; document.getElementById(\'blank-domain\').style.display =\'none\'; document.getElementById(\'adddomainbutton\').style.display = \'block\'; return false;" /></div>';
+		$content[] = '<div style="width: 35em;"><label style="display: none;" for="domain_'. $index .'">Domain: </label><input style="width: 12em;" id="domain_'. $index .'" name="domain_'. $index .'" value="" onfocus="this.value=\'\';"/> <input type="image" '.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' onclick="document.getElementById(\'key_'. $index .'\').value = \'\'; document.getElementById(\'blank-domain\').style.display =\'none\'; document.getElementById(\'adddomainbutton\').style.display = \'block\'; return false;" /></div>';
 		$content[] = '<div><label style="display: none;" for="key_'. $index .'">'.$LANG->getLL('googleMapsApiKey').': </label></div>';
 		$content[] = '<div><input style="width: 58em;" id="key_'. $index .'" name="key_'. $index .'" value="" /></div>';
 		$content[] = '</div>';
@@ -319,9 +304,8 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 		global $TCA, $LANG;
 		$content = array();
 
-#	 	require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_batchgeocode.php');
 		/* Set the geocoding limit to 1 so that we only get the count, rather than actually geocoding addresses */
-		$batchGeocode = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_batchgeocode', 1);
+		$batchGeocode = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_batchgeocode::class, 1);
 		$batchGeocode->addAllTables();
 		$batchGeocode->geocode();
 
@@ -354,8 +338,7 @@ class  tx_wecmap_module1 extends t3lib_SCbase {
 						}
 						</script>';
 
-#		require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'mod1/class.tx_wecmap_batchgeocode_util.php');
-		$content[] = tx_wecmap_module1_ajax::getStatusBar($processedAddresses, $totalAddresses, false);
+		$content[] = \tx_wecmap_module1_ajax::getStatusBar($processedAddresses, $totalAddresses, false);
 		$content[] = '<input id="startGeocoding" type="submit" value="'.$LANG->getLL('startGeocoding').'" onclick="startGeocode(); return false;"/>';
 
 		return implode(chr(10), $content);
@@ -436,13 +419,8 @@ include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod1/index.php'
 
 
 // Make instance:
-$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_module1');
+$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_module1::class);
 $SOBE->init();
-
-// Include files?
-foreach($SOBE->include_once as $INC_FILE)	include_once($INC_FILE);
 
 $SOBE->main();
 $SOBE->printContent();
-
-?>

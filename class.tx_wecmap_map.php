@@ -28,36 +28,27 @@
 * This copyright notice MUST APPEAR in all copies of the file!
 ***************************************************************/
 
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_marker.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_markergroup.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_cache.php');
-#require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'class.tx_wecmap_shared.php');
-
 /**
  * Main class for the wec_map extension.  This class sits between the various
  * frontend plugins and address lookup service to render map data.  All map
  * services implement this abstract class.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_map {
-	var $lat;
-	var $long;
-	var $zoom;
-	var $radius;
-	var $kilometers;
-	var $markers;
-	var $width;
-	var $height;
-	var $mapName;
-	var $groupCount = 0;
-	var $groups;
-	var $js;
-	var $key;
+	public $lat;
+	public $long;
+	public $zoom;
+	public $radius;
+	public $kilometers;
+	public $markers;
+	public $width;
+	public $height;
+	public $mapName;
+	public $groupCount = 0;
+	public $groups;
+	public $js;
+	public $key;
 
-	var $mapOptions = array();
+	public $mapOptions = array();
 
 	/**
 	 * Class constructor stub.  Override in the map_service classes. Look there for
@@ -301,11 +292,9 @@ class tx_wecmap_map {
 		if(!empty($this->radius)) {
 			$distance = $this->getDistance($this->lat, $this->long, $lat, $long);
 
-			// devlog start
 			if(TYPO3_DLOG) {
 				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog($this->mapName.': Distance: '.$distance.' - Radius: '.$this->radius, 'wec_map_api');
 			}
-			// devlog end
 
 			if(!empty($this->lat) && !empty($this->long) &&  $distance > $this->radius) {
 				return null;
@@ -378,7 +367,6 @@ class tx_wecmap_map {
 		$uid = intval($uid);
 
 		// first get the mappable info from the TCA
-		\TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA($table);
 		$tca = $GLOBALS['TCA'][$table]['ctrl']['EXT']['wec_map'];
 
 		if(!$tca) return false;
@@ -437,7 +425,7 @@ class tx_wecmap_map {
 	function addGroup($minzoom = 1, $maxzoom = '') {
 
 		if(!is_object($this->groups[$minzoom.':'.$maxzoom])) {
-			$group =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wecmap_markergroup', $this->groupCount, $minzoom, $maxzoom);
+			$group =  \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_wecmap_markergroup::class, $this->groupCount, $minzoom, $maxzoom);
 			$this->groupCount++;
 			$group->setMapName($this->mapName);
 			$this->groups[$minzoom.':'.$maxzoom] =& $group;
@@ -482,6 +470,3 @@ class tx_wecmap_map {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_map.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_map.php']);
 }
-
-
-?>

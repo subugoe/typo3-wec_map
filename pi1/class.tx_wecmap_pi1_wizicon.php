@@ -28,12 +28,10 @@
 ***************************************************************/
 /**
  * Class that adds the wizard icon.
- *
- * @author	Web-Empowered Church Team <servant@webempoweredchurch.org>
  */
-
 class tx_wecmap_pi1_wizicon {
-    function proc($wizardItems)    {
+
+   public function proc($wizardItems)    {
         global $LANG;
 
         $LL = $this->includeLocalLang();
@@ -46,9 +44,12 @@ class tx_wecmap_pi1_wizicon {
         );
         return $wizardItems;
     }
-    function includeLocalLang()    {
+
+    protected function includeLocalLang()    {
         $llFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('wec_map').'pi1/locallang.xml';
-		$localLanguageParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Localization\\Parser\\LocallangXmlParser');
+
+        /** @var \TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser $localLanguageParser */
+		$localLanguageParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
 		$LOCAL_LANG = $localLanguageParser->getParsedData($llFile, $GLOBALS['LANG']->lang);
         return $LOCAL_LANG;
     }
@@ -57,5 +58,3 @@ class tx_wecmap_pi1_wizicon {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi1/class.tx_wecmap_pi1_wizicon.php'])    {
     include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/pi1/class.tx_wecmap_pi1_wizicon.php']);
 }
-
-?>

@@ -33,10 +33,6 @@
  * Defines a group of markers to display on the map. This class is the interface
  * to the GMarkerManager. Every map has one or more groups, which has one or more
  * markers. Every marker belongs to one group, and every group belongs to one map.
- *
- * @author Web-Empowered Church Team <map@webempoweredchurch.org>
- * @package TYPO3
- * @subpackage tx_wecmap
  */
 class tx_wecmap_markergroup {
 	var $markers;			// array of marker objects
@@ -181,6 +177,3 @@ class tx_wecmap_markergroup {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_markergroup.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/class.tx_wecmap_markergroup.php']);
 }
-
-
-?>

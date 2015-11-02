@@ -68,7 +68,7 @@ class tx_wecmap_recordhandler {
 		$limit = null;
 		// Select rows:
 		$displayRows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*','tx_wecmap_cache','', 'address', 'address', $limit);
-
+		$output = '';
 		foreach($displayRows as $row) {
 
 			// Add icon/title and ID:
@@ -79,8 +79,8 @@ class tx_wecmap_recordhandler {
 			$cells[] = '<td class="latitude">'.$row['latitude'].'</td>';
 			$cells[] = '<td class="longitude">'.$row['longitude'].'</td>';
 
-			$cells[] = '<td class="editButton"><a href="#" onclick="editRecord(\''. $row['address_hash'] .'\'); return false;"><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="'.$LANG->getLL('editAddress').'" alt="'.$LANG->getLL('editAddress').'" /></a></td>';
-			$cells[] = '<td class="deleteButton"><a href="#" onclick="deleteRecord(\''. $row['address_hash'] .'\'); return false;"><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' title="'.$LANG->getLL('deleteAddress').'" alt="'.$LANG->getLL('deleteAddress').'" /></a></td>';
+			$cells[] = '<td class="editButton"><a href="#" onclick="editRecord(\''. $row['address_hash'] .'\'); return false;"><img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="'.$LANG->getLL('editAddress').'" alt="'.$LANG->getLL('editAddress').'" /></a></td>';
+			$cells[] = '<td class="deleteButton"><a href="#" onclick="deleteRecord(\''. $row['address_hash'] .'\'); return false;"><img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' title="'.$LANG->getLL('deleteAddress').'" alt="'.$LANG->getLL('deleteAddress').'" /></a></td>';
 
 			// Compile Row:
 			$output.= '
@@ -279,12 +279,12 @@ class tx_wecmap_recordhandler {
 				}
 
 				function getSaveCancelLinks(id, oldLat, oldLong) {
-					var link = \'<a href="#" onclick="saveRecord(\\\'\'+id+\'\\\'); return false;"><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/savedok.gif','width="11" height="12"').' title="'.$LANG->getLL('updateAddress').'" alt="'.$LANG->getLL('updateAddress').'" /></a><a href="#" onclick="unEdit(\\\'\'+id+\'\\\',\\\'\'+oldLong+\'\\\', \\\'\'+oldLat+\'\\\'); return false;"><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/closedok.gif','width="11" height="12"').' title="'.$LANG->getLL('cancelUpdate').'" alt="'.$LANG->getLL('cancelUpdate').'" /></a>\';
+					var link = \'<a href="#" onclick="saveRecord(\\\'\'+id+\'\\\'); return false;"><img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/savedok.gif','width="11" height="12"').' title="'.$LANG->getLL('updateAddress').'" alt="'.$LANG->getLL('updateAddress').'" /></a><a href="#" onclick="unEdit(\\\'\'+id+\'\\\',\\\'\'+oldLong+\'\\\', \\\'\'+oldLat+\'\\\'); return false;"><img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/closedok.gif','width="11" height="12"').' title="'.$LANG->getLL('cancelUpdate').'" alt="'.$LANG->getLL('cancelUpdate').'" /></a>\';
 					return link;
 				}
 
 				function getEditLink(id) {
-					var link = \'<a href="#" onclick="editRecord(\\\'\'+id+\'\\\'); return false;"><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="'.$LANG->getLL('editAddress').'" alt="'.$LANG->getLL('editAddress').'" /></a>\';
+					var link = \'<a href="#" onclick="editRecord(\\\'\'+id+\'\\\'); return false;"><img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/edit2.gif','width="11" height="12"').' title="'.$LANG->getLL('editAddress').'" alt="'.$LANG->getLL('editAddress').'" /></a>\';
 					return link;
 				}
 
@@ -335,7 +335,7 @@ class tx_wecmap_recordhandler {
 		$content = $LANG->getLL('totalCachedAddresses') .
 			': <strong><span id="recordCount">'.$this->count.'</span></strong> '.
 			'<a href="#" onclick="deleteAll(); return false;">'.
-			'<img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' title="'.$LANG->getLL('deleteCache').'" alt="'.$LANG->getLL('deleteCache').'" />'.
+			'<img'.\TYPO3\CMS\Backend\Utility\IconUtility::skinImg($GLOBALS['BACK_PATH'],'gfx/garbage.gif','width="11" height="12"').' title="'.$LANG->getLL('deleteCache').'" alt="'.$LANG->getLL('deleteCache').'" />'.
 			'</a>';
 
 		return $content;
@@ -349,5 +349,3 @@ class tx_wecmap_recordhandler {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod1/class.tx_wecmap_recordhandler.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wec_map/mod1/class.tx_wecmap_recordhandler.php']);
 }
-
-?>
